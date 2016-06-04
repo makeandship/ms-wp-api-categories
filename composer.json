@@ -1,0 +1,14 @@
+{
+    "name": "makeandship/ms-wp-api-categories",
+    "description": "Extend wordpress REST API with support for categories",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Make and Ship Limited",
+            "homepage": "https://www.makeandship.com/"
+        }
+    ],
+    "require": {
+        "composer/installers": "*"
+    }
+}

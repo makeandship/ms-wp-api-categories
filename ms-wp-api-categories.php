@@ -47,7 +47,7 @@ class MS_WP_API_Categories {
             $prepared_args['parent'] = $request['parent'];
         }
 
-        $query_result = get_terms( 'category', $prepared_args );
+        $query_result = get_terms( get_taxonomies(), $prepared_args );
 
         $response = array();
 

@@ -25,13 +25,14 @@ class MS_WP_API_Categories {
     function add_all_categories_route() {
         register_rest_route( 'wp/v2/categories', '/all', array(
             'methods' => array(
-                WP_REST_Server::READABLE
+                'GET'
             ),
             'callback' => array( $this, 'add_all_categories_route_callback' )
         ) );
     }
 
     function add_all_categories_route_callback( WP_REST_Request $request ) {
+        error_log('add_all_categories_route_callback');
         $prepared_args = array(
             'exclude'    => $request['exclude'],
             'include'    => $request['include'],
@@ -72,6 +73,7 @@ class MS_WP_API_Categories {
     }
 
     function add_categories_to_posts() {
+        error_log('add_categories_to_posts');
         // Posts
         register_rest_field( 'post',
             'category_ids',
@@ -121,7 +123,30 @@ class MS_WP_API_Categories {
         if (is_string($categories)) {
             $categories = explode(",",$categories);
         }
-        return wp_set_post_categories($object->ID,$categories);
+        
+        $taxonomies = get_taxonomies();
+        $taxonomy_categories = array();
+        foreach($categories as $category) {
+            if (is_numeric($category)) {
+                $category = intval($category);
+            }
+            foreach($taxonomies as $taxonomy) {
+                if (term_exists($category, $taxonomy)) {
+                    if (!isset($taxonomy_categories[$taxonomy])) {
+                        $taxonomy_categories[$taxonomy] = array();
+                    }
+                    array_push($taxonomy_categories[$taxonomy], $category);
+                }
+            }
+        }
+        
+        $updated = array();
+        foreach($taxonomy_categories as $taxonomy => $categories) {
+            $stored = wp_set_object_terms( $object->ID, $categories, $taxonomy );
+            array_push($updated, $stored);
+        }
+        
+        return $updated;
     }
 }
 
